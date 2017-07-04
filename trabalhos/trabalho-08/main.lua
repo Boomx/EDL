@@ -1,6 +1,6 @@
 add = 0
 function love.load ()
-
+    counter = 0
     xBarLimits = {200,500}
     yBarLimits = {100,400}
 
@@ -60,12 +60,12 @@ function generateShooter()
 end
 
 function generateMovingBar(x,y,vel)
-    local direction;
+    local direction =  {0,1};
     local me; 
     local xLimits = {200,500}
     local yLimits = {100,400}
-    local height = 20
-    local width = 100
+    local height = 100
+    local width = 20
     local halfwidth = width/4
     local halfheight = height/4
     local enabled = true
@@ -77,7 +77,8 @@ function generateMovingBar(x,y,vel)
         end
     end
     me = {
-        xLimits = xLimits
+        direction = direction
+        , xLimits = xLimits
         , yLimits = yLimits
         , height = height
         , width = width
@@ -98,14 +99,22 @@ function generateMovingBar(x,y,vel)
         -- Trabalho-08: co é uma coroutine que define o comportamento da barra que se movimenta
         , co = coroutine.create( function()
                     while true do
-                        setHorizontal(false)
-                        coroutine.yield({0,1})
+
+                        direction = {1,0}
                         setHorizontal(true)
-                        coroutine.yield({1,0})
+                        coroutine.yield()
+
+                        direction = {0,-1}
                         setHorizontal(false)
-                        coroutine.yield({0,-1})
+                        coroutine.yield()
+
+                        direction = {-1,0}
                         setHorizontal(true)
-                        coroutine.yield({-1,0})
+                        coroutine.yield()
+
+                        direction = {0,1}
+                        setHorizontal(false)
+                        coroutine.yield()
                     end
                 end),
     }
@@ -141,16 +150,18 @@ end
 function love.update (dt)
     if (gameOn) then
         -- coroutine.resume(movingBar.co,dt)
-        local barx, bary, barheight, barwidth, barheight, barwidth = movingBar.get()
-        if(barx < xBarLimits[2] and bary == yBarLimits[1]) then
+        local barx, bary = movingBar.get()
+        -- if(barx <= xBarLimits[2] and bary == yBarLimits[2]) then
+        if(barx > xBarLimits[1] and bary == yBarLimits[2]) then
+            counter = counter + 1
             coroutine.resume(movingBar.co)
-        elseif(barx > xBarLimits[1] and bary == yBarLimits[2]) then
-            coroutine.resume(movingBar.co)
-        elseif(bary <= yBarLimits[2] and barx == xBarLimits[1]) then
-            coroutine.resume(movingBar.co)
-        else 
-            coroutine.resume(movingBar.co)
+        --     coroutine.resume(movingBar.co)
+        -- elseif(bary <= yBarLimits[2] and barx == xBarLimits[1]) then
+        --     coroutine.resum  e(movingBar.co)
+        -- else 
+        --     coroutine.resume(movingBar.co)
         end
+        movingBar.move(dt)
         gaugeAngle(dt)
         if (ball) then
             ball.move(dt)
@@ -282,9 +293,10 @@ end
 function logMe()
     local x,y = movingBar.get()
     logs = {
-        {"x1: " .. x}
+          {"x1: " .. x}
         , {"y1: " .. y}
         , {"add: " .. boolToString(add)}
+        , {"counter: " .. counter}
         -- , {"OBJ X: " .. globalOBJ.x}
         -- , {"OBJ Y: " .. globalOBJ.y}
     }
