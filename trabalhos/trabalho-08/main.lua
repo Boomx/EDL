@@ -1,5 +1,9 @@
 add = 0
 function love.load ()
+
+    xBarLimits = {200,500}
+    yBarLimits = {100,400}
+
     width = 800
     height = 600
     centerX = width/2
@@ -56,6 +60,7 @@ function generateShooter()
 end
 
 function generateMovingBar(x,y,vel)
+    local direction;
     local me; 
     local xLimits = {200,500}
     local yLimits = {100,400}
@@ -78,10 +83,10 @@ function generateMovingBar(x,y,vel)
         , width = width
         , halfwidth = halfwidth
         , enabled = enabled
-        , move = function(dx,dy)
+        , move = function(dt)
             -- Trabalho-08: x e y são usados como closure, guardando o valor dado por argumento e usando quando necessário
-                x = x + dx
-                y = y + dy
+                x = x + dt*direction[1]*vel
+                y = y + dt*direction[2]*vel
                 if (x > xLimits[2]) then x = xLimits[2] end
                 if (y > yLimits[2]) then y = yLimits[2] end
                 if (x < xLimits[1]) then x = xLimits[1] end
@@ -91,22 +96,16 @@ function generateMovingBar(x,y,vel)
                 return x, y, height, width, height/4, width/4
         end
         -- Trabalho-08: co é uma coroutine que define o comportamento da barra que se movimenta
-        , co = coroutine.create( function(dt)
+        , co = coroutine.create( function()
                     while true do
-                        if(x < xLimits[2] and y == yLimits[1]) then
-                            setHorizontal(true)
-                            me.move(vel*dt,0)
-                        elseif(x > xLimits[1] and y == yLimits[2]) then
-                            setHorizontal(true)
-                            me.move(-vel*dt,0)
-                        elseif(y <= yLimits[2] and x == xLimits[1]) then
-                            setHorizontal(false)
-                            me.move(0,-vel*dt)
-                        else 
-                            setHorizontal(false)
-                            me.move(0,vel*dt)
-                        end
-                        dt = coroutine.yield()
+                        setHorizontal(false)
+                        coroutine.yield({0,1})
+                        setHorizontal(true)
+                        coroutine.yield({1,0})
+                        setHorizontal(false)
+                        coroutine.yield({0,-1})
+                        setHorizontal(true)
+                        coroutine.yield({-1,0})
                     end
                 end),
     }
@@ -141,7 +140,17 @@ end
 
 function love.update (dt)
     if (gameOn) then
-        coroutine.resume(movingBar.co,dt)
+        -- coroutine.resume(movingBar.co,dt)
+        local barx, bary, barheight, barwidth, barheight, barwidth = movingBar.get()
+        if(barx < xBarLimits[2] and bary == yBarLimits[1]) then
+            coroutine.resume(movingBar.co)
+        elseif(barx > xBarLimits[1] and bary == yBarLimits[2]) then
+            coroutine.resume(movingBar.co)
+        elseif(bary <= yBarLimits[2] and barx == xBarLimits[1]) then
+            coroutine.resume(movingBar.co)
+        else 
+            coroutine.resume(movingBar.co)
+        end
         gaugeAngle(dt)
         if (ball) then
             ball.move(dt)
