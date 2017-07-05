@@ -1,4 +1,3 @@
-add = 0
 function love.load ()
     counter = 0
     xBarLimits = {200,500}
@@ -88,6 +87,7 @@ function generateMovingBar(x,y,vel)
             -- Trabalho-08: x e y são usados como closure, guardando o valor dado por argumento e usando quando necessário
                 x = x + dt*direction[1]*vel
                 y = y + dt*direction[2]*vel
+                counter = direction[1]
                 if (x > xLimits[2]) then x = xLimits[2] end
                 if (y > yLimits[2]) then y = yLimits[2] end
                 if (x < xLimits[1]) then x = xLimits[1] end
@@ -121,7 +121,6 @@ function generateMovingBar(x,y,vel)
     return me
 end
 
-
 function log2(args)
     for i=1, table.getn(args) do
         love.graphics.printf(args[i], width-200,height-(i*30),200,"left")
@@ -149,17 +148,15 @@ end
 
 function love.update (dt)
     if (gameOn) then
-        -- coroutine.resume(movingBar.co,dt)
         local barx, bary = movingBar.get()
-        -- if(barx <= xBarLimits[2] and bary == yBarLimits[2]) then
-        if(barx > xBarLimits[1] and bary == yBarLimits[2]) then
-            counter = counter + 1
+        if(barx == xBarLimits[1] and bary == yBarLimits[2]) then
             coroutine.resume(movingBar.co)
-        --     coroutine.resume(movingBar.co)
-        -- elseif(bary <= yBarLimits[2] and barx == xBarLimits[1]) then
-        --     coroutine.resum  e(movingBar.co)
-        -- else 
-        --     coroutine.resume(movingBar.co)
+        elseif(barx == xBarLimits[2] and bary == yBarLimits[2]) then
+            coroutine.resume(movingBar.co)
+        elseif(barx == xBarLimits[1] and bary == yBarLimits[1]) then
+            coroutine.resume(movingBar.co)
+        elseif(barx == xBarLimits[2] and bary == yBarLimits[1]) then
+            coroutine.resume(movingBar.co)
         end
         movingBar.move(dt)
         gaugeAngle(dt)
@@ -198,7 +195,7 @@ function love.draw ()
         love.graphics.printf("APERTE R PARA RECOMEÇAR", centerX-100,centerY + 100,400,"left")
     end
 
-    logMe()
+    -- logMe()
 end
 
 function invertMovement(axis)
@@ -295,7 +292,8 @@ function logMe()
     logs = {
           {"x1: " .. x}
         , {"y1: " .. y}
-        , {"add: " .. boolToString(add)}
+        , {"add: " .. add}
+        -- , {"add: " .. boolToString(add)}
         , {"counter: " .. counter}
         -- , {"OBJ X: " .. globalOBJ.x}
         -- , {"OBJ Y: " .. globalOBJ.y}
