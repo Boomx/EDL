@@ -54,10 +54,10 @@ aprovados =  List.map nome (List.filter (\x -> media x > 7) turma)
 -- c) MÉDIA FINAL DOS ALUNOS DE "turma" (média de todas as médias)
 
 total: Float
-total = 3.0
+total = List.foldr (+) 0 (medias) / toFloat (List.length turma)
 
 -- É permitido usar funções auxiliares, mas não é necessário.
 -- (As soluções são pequenas.)
 
 
-main = text (toString aprovados)
+main = text (toString total)
