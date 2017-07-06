@@ -90,6 +90,33 @@ newPoint = List.map .x [point,{x=0,y=0}]
 
 ```
 
+## Expressividade
+
+Elm comparada com javascript se mostra muito menos expressiva, pois a segunda linguagem é multiparadigma, enquanto Elm tem o objetivo de ser somente funcional.
+
+#### Segue abaixo um exemplo:
+
+##### O quadrado de um array
+Javascript
+```javascript
+  var myArray = [1,2,3,4]
+
+  myArray.forEach(function(element){
+    element = element * element
+  })
+
+  var myArray2 = myArray.map(function(element){
+    return element * element
+  })
+```
+
+Elm
+```elm
+  myArray = [1,2,3,4]
+
+  myArray2 = List.map (\x -> x*x) myArray
+```
+
 Outro diferencial nesta linguagem é a interpolação com HTML, CSS e Javascript.
 Enquanto em javascript, podemos no máximo colocar todos os códigos no mesmo arquivo, em Elm eles se comunicam como um só, 
 possibilitando 
